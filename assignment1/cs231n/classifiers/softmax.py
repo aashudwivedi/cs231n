@@ -38,9 +38,15 @@ def softmax_loss_naive(W, X, y, reg):
     scores -= np.max(scores) # numerical stability
     exp_scores = np.exp(scores)
     exp_sum = np.sum(exp_scores)
-    loss += -np.log(exp_scores[y[i]] / exp_sum)
+    softmax = exp_scores / exp_sum
+    loss += -np.log(softmax[y[i]]) # pick the softmax score of the correct class
+
+    for j in range(c):
+      is_correct_cls = j == y[i]  # evaluates to zero or one
+      dW[:, j] += (softmax[j] - is_correct_cls) * X[i,:]
 
   loss /= n
+  dW = dW / n + reg * W
   #############################################################################
   #                          END OF YOUR CODE                                 #
   #############################################################################
