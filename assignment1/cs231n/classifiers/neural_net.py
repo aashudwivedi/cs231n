@@ -76,8 +76,9 @@ class TwoLayerNet(object):
     # Store the result in the scores variable, which should be an array of      #
     # shape (N, C).                                                             #
     #############################################################################
-    s1 = np.maximum(X.dot(W1) + b1, 0)
-    scores = s1.dot(W2) + b2
+    layer_1_output = X.dot(W1) + b1
+    hidden = np.maximum(layer_1_output, 0) # relu output
+    scores = hidden.dot(W2) + b2
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
@@ -95,9 +96,12 @@ class TwoLayerNet(object):
     # classifier loss.                                                          #
     #############################################################################
 
+    # compute softmax
     scores -= np.amax(scores, axis=1, keepdims=True)
     exp_scores = np.exp(scores)
     softmax = exp_scores / np.sum(exp_scores, axis=1, keepdims=True)
+
+    # compute loss
     loss = -np.sum(np.log(softmax[np.arange(N), y]))
     loss /= N
 
@@ -116,7 +120,38 @@ class TwoLayerNet(object):
     # and biases. Store the results in the grads dictionary. For example,       #
     # grads['W1'] should store the gradient on W1, and be a matrix of same size #
     #############################################################################
-    pass
+
+    # gradient of softmax
+    dscores = softmax
+    dscores[np.arange(N), y] -= 1
+    dscores /= N
+
+    # print('x {}'.format(X.shape))
+    # print('w1 {}'.format(W1.shape))
+    # print('w2 {}'.format(W2.shape))
+    # print('scores {}'.format(scores.shape))
+    # print('dscores {}'.format(dscores.shape))
+
+    dW2 = np.dot(hidden.T, dscores)
+    dW2 += 2 * reg * W2
+    db2 = np.sum(dscores, axis=0)
+
+    # backprop to hidden layer
+    dhidden = np.dot(dscores, W2.T)
+    # backprop to relu
+
+    relu_mask = hidden > 0
+    dRelu = relu_mask * dhidden
+
+    dW1 = np.dot(X.T, dRelu)
+    dW1 += 2 * reg * W1
+    db1 = np.sum(dRelu, axis=0, keepdims=True)
+
+    grads['W2'] = dW2
+    grads['b2'] = db2
+    grads['W1'] = dW1
+    grads['b1'] = db1
+
     #############################################################################
     #                              END OF YOUR CODE                             #
     #############################################################################
