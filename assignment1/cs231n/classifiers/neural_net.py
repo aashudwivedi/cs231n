@@ -145,7 +145,7 @@ class TwoLayerNet(object):
 
     dW1 = np.dot(X.T, dRelu)
     dW1 += 2 * reg * W1
-    db1 = np.sum(dRelu, axis=0, keepdims=True)
+    db1 = np.sum(dRelu, axis=0)
 
     grads['W2'] = dW2
     grads['b2'] = db2
@@ -195,7 +195,9 @@ class TwoLayerNet(object):
       # TODO: Create a random minibatch of training data and labels, storing  #
       # them in X_batch and y_batch respectively.                             #
       #########################################################################
-      pass
+      random_idx = np.random.choice(np.arange(num_train), batch_size)
+      X_batch = X[random_idx]
+      y_batch = y[random_idx]
       #########################################################################
       #                             END OF YOUR CODE                          #
       #########################################################################
@@ -210,7 +212,8 @@ class TwoLayerNet(object):
       # using stochastic gradient descent. You'll need to use the gradients   #
       # stored in the grads dictionary defined above.                         #
       #########################################################################
-      pass
+      for key, val in grads.items():
+          self.params[key] -= val * learning_rate
       #########################################################################
       #                             END OF YOUR CODE                          #
       #########################################################################
