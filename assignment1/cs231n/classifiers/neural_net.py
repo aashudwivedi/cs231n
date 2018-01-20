@@ -196,7 +196,7 @@ class TwoLayerNet(object):
       # them in X_batch and y_batch respectively.                             #
       #########################################################################
       random_idx = np.random.choice(np.arange(num_train), batch_size)
-      X_batch = X[random_idx]
+      X_batch = X[random_idx, :]
       y_batch = y[random_idx]
       #########################################################################
       #                             END OF YOUR CODE                          #
@@ -258,7 +258,7 @@ class TwoLayerNet(object):
     ###########################################################################
     # TODO: Implement this function; it should be VERY simple!                #
     ###########################################################################
-    pass
+    y_pred = np.argmax(self.loss(X), axis=1)
     ###########################################################################
     #                              END OF YOUR CODE                           #
     ###########################################################################
