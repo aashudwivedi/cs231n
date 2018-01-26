@@ -219,7 +219,6 @@ class FullyConnectedNet(object):
         for k, v in self.params.items():
             self.params[k] = v.astype(dtype)
 
-
     def loss(self, X, y=None):
         """
         Compute loss and gradient for the fully-connected net.
@@ -285,7 +284,9 @@ class FullyConnectedNet(object):
         # of 0.5 to simplify the expression for the gradient.                      #
         ############################################################################
 
-        dx = scores
+        loss, dsoftmax = layers.softmax_loss(scores, y)
+
+        dx = dsoftmax
         for i in reversed(range(self.num_layers)):
             w_name = 'W{}'.format(i)
             b_name = 'b{}'.format(i)
