@@ -22,7 +22,7 @@ class Solver(object):
     data to watch out for overfitting.
 
     To train a model, you will first construct a Solver instance, passing the
-    model, dataset, and various optoins (learning rate, batch size, etc) to the
+    model, dataset, and various options (learning rate, batch size, etc) to the
     constructor. You will then call the train() method to run the optimization
     procedure and train the model.
 
@@ -252,7 +252,6 @@ class Solver(object):
         acc = np.mean(y_pred == y)
 
         return acc
-
 
     def train(self):
         """
