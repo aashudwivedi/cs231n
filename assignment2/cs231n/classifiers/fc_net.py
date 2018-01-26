@@ -111,7 +111,7 @@ class TwoLayerNet(object):
         for w in [self.params['W1'], self.params['W2']]:
             loss += self.reg * np.sum(w * w) * 0.5
 
-        grads['W1'] = dw1 + self.reg * self.params['W1'] # no need to multiply by 2 as we already have the 0.5 factor in loss
+        grads['W1'] = dw1 + self.reg * self.params['W1']
         grads['W2'] = dw2 + self.reg * self.params['W2']
         grads['b1'] = db1
         grads['b2'] = db2
@@ -252,12 +252,13 @@ class FullyConnectedNet(object):
         ############################################################################
 
         out = X
+        caches = []
         for i in range(self.num_layers):
             w_name = 'W{}'.format(i)
             b_name = 'b{}'.format(i)
-
             out, cache = layer_utils.affine_relu_forward(
                 out, self.params[w_name], self.params[b_name])
+            caches.append(cache)
 
         scores = out
 
@@ -283,7 +284,21 @@ class FullyConnectedNet(object):
         # automated tests, make sure that your L2 regularization includes a factor #
         # of 0.5 to simplify the expression for the gradient.                      #
         ############################################################################
-        pass
+
+        dx = scores
+        for i in reversed(range(self.num_layers)):
+            w_name = 'W{}'.format(i)
+            b_name = 'b{}'.format(i)
+            dx, dw, db = layer_utils.affine_relu_backward(dx, caches[i])
+            grads[w_name] = dw
+            grads[b_name] = db
+
+        for key in self.params.keys():
+            if key.startswith('W'):
+                w = self.params[key]
+                loss += self.reg * np.sum(w * w) * 0.5
+                grads[key] += self.reg * w
+
         ############################################################################
         #                             END OF YOUR CODE                             #
         ############################################################################
