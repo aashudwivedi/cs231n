@@ -255,8 +255,15 @@ class FullyConnectedNet(object):
         for i in range(self.num_layers):
             w_name = 'W{}'.format(i)
             b_name = 'b{}'.format(i)
-            out, cache = layer_utils.affine_relu_forward(
-                out, self.params[w_name], self.params[b_name])
+
+            w = self.params[w_name]
+            b = self.params[b_name]
+
+            if i == self.num_layers - 1:
+                out, cache = layer_utils.affine_forward(out, w, b)
+            else:
+                out, cache = layer_utils.affine_relu_forward(out, w, b)
+
             caches.append(cache)
 
         scores = out
@@ -284,20 +291,32 @@ class FullyConnectedNet(object):
         # of 0.5 to simplify the expression for the gradient.                      #
         ############################################################################
 
-        loss, dsoftmax = layers.softmax_loss(scores, y)
+        softmax_loss, dsoftmax = layers.softmax_loss(scores, y)
+
+        reg_loss = 0
+        for key in self.params.keys():
+            if key.startswith('W'):
+                w = self.params[key]
+                reg_loss += self.reg * np.sum(w * w) * 0.5
+
+        loss = softmax_loss + reg_loss
 
         dx = dsoftmax
         for i in reversed(range(self.num_layers)):
             w_name = 'W{}'.format(i)
             b_name = 'b{}'.format(i)
-            dx, dw, db = layer_utils.affine_relu_backward(dx, caches[i])
+
+            if i == self.num_layers - 1:
+                dx, dw, db = layer_utils.affine_backward(dx, caches[i])
+            else:
+                dx, dw, db = layer_utils.affine_relu_backward(dx, caches[i])
+
             grads[w_name] = dw
             grads[b_name] = db
 
         for key in self.params.keys():
             if key.startswith('W'):
                 w = self.params[key]
-                loss += self.reg * np.sum(w * w) * 0.5
                 grads[key] += self.reg * w
 
         ############################################################################
